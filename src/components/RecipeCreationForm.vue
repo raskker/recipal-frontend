@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Recipe from "../types/Recipe";
+import EDifficulty from "../types/enums/EDifficulty";
 
 export default defineComponent({
   name: "RecipeCreationForm",
@@ -9,8 +10,19 @@ export default defineComponent({
       valid: true,
       currentRecipe: {} as Recipe,
       step: 1,
+      recipeName: "",
       caloriesValue: 0,
+      recipeDesc: "",
       portionValue: 0,
+      cookingTime: 0,
+      workTime: 0,
+      difficulty: { diff: EDifficulty.Easy, name: EDifficulty.Easy.toString() },
+      difficulties: [
+        { diff: EDifficulty.Easy, name: EDifficulty.Easy.toString() },
+        { diff: EDifficulty.Normal, name: EDifficulty.Normal.toString() },
+        { diff: EDifficulty.Hard, name: EDifficulty.Hard.toString() },
+      ],
+      recipeNameRules: [(v: any) => !!v || "Name is required"],
       numberRules: [
         (v: any) =>
           (!isNaN(parseFloat(v)) && !isNaN(v - 0)) || "Must be a number",
@@ -34,7 +46,7 @@ export default defineComponent({
         case 1:
           return "Grundlegende Rezeptdaten";
         case 2:
-          return "Zutaten & Beschreibung";
+          return "Zutaten & Zubereitung";
         default:
           return "Rezept erstellt";
       }
@@ -50,39 +62,59 @@ export default defineComponent({
       <v-avatar color="primary" size="24" v-text="step"></v-avatar>
     </v-card-title>
 
-    <v-form ref="form" v-model="valid" lazy-validation>
+    <v-form ref="form" v-model="valid" lazy-validation style="height: 100%">
       <v-window v-model="step">
         <v-window-item :value="1">
           <v-card-text>
             <v-text-field
+              :rules="recipeNameRules"
+              v-model="recipeName"
               required
               label="Rezeptname"
               placeholder="Spaghetti Carbonara"
             ></v-text-field>
             <v-text-field
               v-model="portionValue"
-              type="number"
               label="Portionen"
               :rules="numberRules"
             ></v-text-field>
             <v-text-field
               v-model="caloriesValue"
-              type="number"
               label="Kalorien"
+              suffix="kcal"
+              :rules="numberRules"
             ></v-text-field>
+            <v-text-field
+              v-model="cookingTime"
+              label="Kochzeit/Backzeit"
+              suffix="Minuten"
+              :rules="numberRules"
+            ></v-text-field>
+            <v-text-field
+              v-model="workTime"
+              label="Gesamtzeit"
+              suffix="Minuten"
+              :rules="numberRules"
+            ></v-text-field>
+            <v-select
+              v-model="difficulty"
+              :items="difficulties"
+              label="Schwierigkeit"
+              item-title="name"
+              item-value="diff"
+            ></v-select>
           </v-card-text>
         </v-window-item>
 
         <v-window-item :value="2">
           <v-card-text>
-            <v-text-field label="Password" type="password"></v-text-field>
-            <v-text-field
-              label="Confirm Password"
-              type="password"
-            ></v-text-field>
-            <span class="text-caption text-grey-darken-1">
-              Please enter a password for your account
-            </span>
+            <v-textarea
+              name="recipeDesc"
+              variant="filled"
+              label="Zubereitungsbeschreibung"
+              auto-grow
+              v-model="recipeDesc"
+            ></v-textarea>
           </v-card-text>
         </v-window-item>
 
@@ -100,10 +132,10 @@ export default defineComponent({
         </v-window-item>
       </v-window>
 
-      <v-divider></v-divider>
-
-      <v-card-actions>
-        <v-btn v-if="step > 1" variant="text" @click="step--"> Back </v-btn>
+      <v-card-actions class="align-end mt-16">
+        <v-btn bottom v-if="step > 1" variant="text" @click="step--">
+          Back
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn v-if="step < 3" color="primary" variant="flat" @click="next">
           Next

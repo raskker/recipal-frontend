@@ -57,7 +57,7 @@ export default defineComponent({
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid>
+      <v-container style="height: 100%" fluid>
         <router-view />
       </v-container>
     </v-main>
