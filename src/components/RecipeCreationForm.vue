@@ -2,6 +2,7 @@
 import { defineComponent } from "vue";
 import Recipe from "../types/Recipe";
 import EDifficulty from "../types/enums/EDifficulty";
+import IngredientsInputForm from "./RecipeCreationComponents/IngredientsInputForm.vue";
 
 export default defineComponent({
   name: "RecipeCreationForm",
@@ -32,7 +33,6 @@ export default defineComponent({
   methods: {
     async validate() {
       const { valid } = await (this.$refs.form as any).validate();
-
       if (!valid) this.step--;
     },
     next() {
@@ -52,14 +52,15 @@ export default defineComponent({
       }
     },
   },
+  components: { IngredientsInputForm },
 });
 </script>
 
 <template>
   <v-card class="mx-auto" max-width="500">
-    <v-card-title class="text-h6 font-weight-regular justify-space-between">
+    <v-card-title class="d-flex align-center text-h6 font-weight-regular">
       <span>{{ currentTitle }}</span>
-      <v-avatar color="primary" size="24" v-text="step"></v-avatar>
+      <v-avatar class="ml-2" color="primary" size="24" v-text="step"></v-avatar>
     </v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation style="height: 100%">
@@ -115,6 +116,7 @@ export default defineComponent({
               auto-grow
               v-model="recipeDesc"
             ></v-textarea>
+            <IngredientsInputForm />
           </v-card-text>
         </v-window-item>
 
@@ -134,11 +136,14 @@ export default defineComponent({
 
       <v-card-actions class="align-end mt-16">
         <v-btn bottom v-if="step > 1" variant="text" @click="step--">
-          Back
+          Zurück
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn v-if="step < 3" color="primary" variant="flat" @click="next">
-          Next
+        <v-btn v-if="step < 2" color="primary" variant="flat" @click="next">
+          Weiter
+        </v-btn>
+        <v-btn v-if="step === 2" color="primary" variant="flat">
+          Erstellen
         </v-btn>
       </v-card-actions>
     </v-form>
